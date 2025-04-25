@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Menu Lateral</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Início do fragmento -->
+    <div th:fragment="sidebar" class="sidebar">
+        <style>
+            .sidebar {
+                width: 220px;
+                background-color: #008f18;
+                position: fixed;
+                height: 100%;
+                top: 0;
+                left: 0;
+                overflow-y: auto; /* Adiciona rolagem ao menu se for muito extenso */
+                z-index: 1000;
+            }
+            
+            .sidebar a {
+                color: #ddd;
+                padding: 10px;
+                text-decoration: none;
+                display: block;
+            }
+            
+            .sidebar a:hover {
+                background-color: #575d63;
+            }
+        </style>
+        
+        <div class="text-center mb-4">
+            <a href="/">
+                <img src="/imagens/logos/LogoInterdata.png" alt="Logo" class="img-fluid" style="width: 100px; margin-top: 15px;">
+            </a>
+        </div>
+        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+        <a href="/animais">Animais</a>
+        <a href="/clientes">Clientes</a>
+        <a href="/produtos">Produtos</a>
+        <a href="/vendedores">Vendedores</a>
+        <a href="/pedidos">Pedidos</a>
+        <a href="#">Itens De Pedidos</a>
+        <a href="#">Estoques</a>
+        <a href="/categorias">Categorias</a>
+        <a href="/racas">Raças</a>
+        <a href="#">Especies</a>
+        <a href="#">Pagamentos</a>
+        <a href="#">Formas de Pagamentos</a>
+        <a href="#">Relatórios</a>
+    </div>
+    <!-- Fim do fragmento -->
+</body>
+</html>

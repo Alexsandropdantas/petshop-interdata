@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Itens ao Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .card-header-custom {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.75rem 1.25rem;
+        }
+        .item-row:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Pedido #<span th:text="${pedido.numeroPedido}"></span></h1>
+                <p class="text-muted">
+                    Data: <span th:text="${#temporals.format(pedido.dataEHora, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+            </div>
+        </div>
+        
+        <div th:if="${mensagemSucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensagemSucesso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${mensagemErro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row">
+                        <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="card-header-custom">
+                        <h5 class="mb-0">Adicionar Novo Item</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/pedidos/adicionar-item}" th:object="${itemPedido}" method="post">
+                            <div class="mb-3">
+                                <label for="produto" class="form-label">Produto</label>
+                                <select class="form-select" id="produto" th:field="*{produto.id}" required>
+                                    <option value="">Selecione o produto</option>
+                                    <option th:each="prod : ${produtos}" 
+                                            th:value="${prod.id}" 
+                                            th:text="${prod.nome + ' - ' + #numbers.formatCurrency(prod.preco)}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="vendedor" class="form-label">Vendedor</label>
+                                <select class="form-select" id="vendedor" th:field="*{vendedor.id}" required>
+                                    <option value="">Selecione o vendedor</option>
+                                    <option th:each="vend : ${vendedores}" 
+                                            th:value="${vend.id}" 
+                                            th:text="${vend.nome}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="cliente" class="form-label">Cliente</label>
+                                <select class="form-select" id="cliente" th:field="*{cliente.id}" required>
+                                    <option value="">Selecione o cliente</option>
+                                    <option th:each="cli : ${clientes}" 
+                                            th:value="${cli.id}" 
+                                            th:text="${cli.nome}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="animal" class="form-label">Animal (opcional)</label>
+                                <select class="form-select" id="animal" th:field="*{animal.id}">
+                                    <option value="">Selecione o animal (opcional)</option>
+                                                                    </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="quantidade" class="form-label">Quantidade</label>
+                                        <input type="number" class="form-control" id="quantidade" th:field="*{quantidade}" 
+                                              min="1" value="1" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="precoUnitario" class="form-label">Preço Unitário</label>
+                                        <input type="number" step="0.01" class="form-control" id="precoUnitario" 
+                                              th:field="*{precoUnitario}" placeholder="Preço do produto">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Adicionar Item</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+                        <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-header-custom">
+                        <h5 class="mb-0">Itens do Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Vendedor</th>
+                                        <th>Cliente</th>
+                                        <th>Animal</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unitário</th>
+                                        <th>Subtotal</th>
+                                        <th>Ações</th>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${pedido.itensPedido}" class="item-row">
+                                    <td th:text="${item.produto.nome}"></td>
+                                    <td th:text="${item.vendedor.nome}"></td>
+                                    <td th:text="${item.cliente.nome}"></td>
+                                    <td th:text="${item.animal != null ? item.animal.nome : '-'}"></td>
+                                    <td th:text="${item.quantidade}"></td>
+                                    <td th:text="${#numbers.formatCurrency(item.precoUnitario)}"></td>
+                                    <td th:text="${#numbers.formatCurrency(item.quantidade * item.precoUnitario)}"></td>
+                                    <td>
+                                        <a th:href="@{/pedidos/remover-item/{id}(id=${item.id})}" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Remover
+                                        </a>
+                                    </td>
+                                </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mt-4">
+                <h5>Total do Pedido: <span th:text="${#numbers.formatCurrency(pedido.valorTotal)}"></span></h5>
+                <a th:href="@{/pedidos}" class="btn btn-secondary me-2">Voltar para Pedidos</a>
+                <button class="btn btn-success">Finalizar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            $('#cliente').change(function() {
+                var clienteId = $(this).val();
+                var animalSelect = $('#animal');
+                animalSelect.empty().append('<option value="">Selecione o animal (opcional)</option>');
+                if (clienteId) {
+                    $.ajax({
+                        url: '/clientes/' + clienteId + '/animais',
+                        type: 'GET',
+                        success: function(data) {
+                            $.each(data, function(i, animal) {
+                                animalSelect.append('<option value="' + animal.id + '">' + animal.nome + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+
+            $('#produto').change(function() {
+                var produtoId = $(this).val();
+                if (produtoId) {
+                    $.ajax({
+                        url: '/produtos/' + produtoId + '/preco',
+                        type: 'GET',
+                        success: function(data) {
+                            $('#precoUnitario').val(data);
+                        }
+                    });
+                } else {
+                    $('#precoUnitario').val('');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

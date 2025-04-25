@@ -1,0 +1,4 @@
+.centralizado {
+    display: flex;
+    flex-direction: column;
+  }

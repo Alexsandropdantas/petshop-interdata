@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras Simples</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-item {
+            border-bottom: 1px dashed #eee;
+            padding: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #cart {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #total {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Produtos Disponíveis</h2>
+    <div id="products-container">
+        </div>
+
+    <div id="cart">
+        <h3>Seu Carrinho</h3>
+        <div id="cart-items">
+            <p>O carrinho está vazio.</p>
+        </div>
+        <div id="total">
+            Total: R$ 0.00
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: 'Ração para Cachorro', price: 25.50 },
+            { id: 2, name: 'Brinquedo para Gato', price: 12.99 },
+            { id: 3, name: 'Shampoo para Pets', price: 18.75 },
+            { id: 4, name: 'Coleira Anti-pulgas', price: 35.00 }
+        ];
+
+        let cart = [];
+
+        const productsContainer = document.getElementById('products-container');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const totalElement = document.getElementById('total');
+
+        function renderProducts() {
+            productsContainer.innerHTML = '';
+            products.forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.classList.add('product');
+                productDiv.innerHTML = `
+                    <span>${product.name} - R$ ${product.price.toFixed(2)}</span>
+                    <button onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+                `;
+                productsContainer.appendChild(productDiv);
+            });
+        }
+
+        function addToCart(productId) {
+            const productToAdd = products.find(product => product.id === productId);
+
+            if (productToAdd) {
+                const existingItem = cart.find(item => item.product.id === productId);
+
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ product: productToAdd, quantity: 1 });
+                }
+                updateCartDisplay();
+            }
+        }
+
+        function updateCartDisplay() {
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p>O carrinho está vazio.</p>';
+            } else {
+                cart.forEach(item => {
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.classList.add('cart-item');
+                    cartItemDiv.innerHTML = `
+                        <span>${item.product.name} x ${item.quantity}</span>
+                        <span>R$ ${(item.product.price * item.quantity).toFixed(2)}</span>
+                    `;
+                    cartItemsContainer.appendChild(cartItemDiv);
+                    total += item.product.price * item.quantity;
+                });
+            }
+
+            totalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+
+        // Inicializar a exibição dos produtos
+        renderProducts();
+    </script>
+
+</body>
+</html>

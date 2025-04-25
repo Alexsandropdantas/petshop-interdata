@@ -1,0 +1,41 @@
+{
+    "properties": [
+      {
+        "name": "imagens.path",
+        "type": "java.lang.String",
+        "description": "A descrição do caminho base para as imagens",
+        "value": "/caminho/base/das/imagens"
+      },
+      {
+        "name": "imagens.vendedores.path",
+        "type": "java.lang.String",
+        "description": "Caminho para imagens de vendedores",
+        "value": "/caminho/base/das/imagens/vendedores"
+      },
+      {
+        "name": "imagens.produtos.path",
+        "type": "java.lang.String",
+        "description": "Caminho para imagens de produtos",
+        "value": "/caminho/base/das/imagens/produtos"
+      },
+      {
+        "name": "imagens.clientes.path",
+        "type": "java.lang.String",
+        "description": "Caminho para imagens de clientes",
+        "value": "/caminho/base/das/imagens/clientes"
+      },
+      {
+        "name": "imagens.animais.path",
+        "type": "java.lang.String",
+        "description": "Caminho para imagens de animais",
+        "value": "/caminho/base/das/imagens/animais"
+      },
+      {
+        "name": "imagens.logos.path",
+        "type": "java.lang.String",
+        "description": "Caminho para logos",
+        "value": "/caminho/base/das/imagens/logos"
+      }
+    ]
+  }
+  
