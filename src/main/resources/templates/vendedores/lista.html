@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Lista de Vendedores</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -7,33 +8,36 @@
 
     </style>
 </head>
+
 <body>
     <div th:replace="fragmentos/menu-lateral :: sidebar"></div>
     <div class="centralizado">
-<div class="container">
-    <h2>Lista de Vendedores</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Telefone</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="vendedor : ${vendedores}">
-                <td th:text="${vendedor.nome}"></td>
-                <td th:text="${vendedor.email}"></td>
-                <td th:text="${vendedor.telefone}"></td>
-                <td>
-                    <a th:href="@{'/vendedores/editar/' + ${vendedor.id}}" class="btn btn-warning btn-sm">Editar</a>
-                    <a th:href="@{'/vendedores/deletar/' + ${vendedor.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Deseja realmente excluir este Vendedor?');">Excluir</a>
-                     
-                 </td>
-            </tr>
-        </tbody>
-    </table>
-    <a href="/vendedores/cadastro" class="btn btn-primary">Novo Vendedor</a>
-</div>
+        <div class="container">
+            <h2>Lista de Vendedores</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="vendedor : ${vendedores}">
+                        <td th:text="${vendedor.nome}"></td>
+                        <td th:text="${vendedor.email}"></td>
+                        <td th:text="${vendedor.telefone}"></td>
+                        <td>
+                            <a th:href="@{'/vendedores/editar/' + ${vendedor.id}}"
+                                class="btn btn-warning btn-sm">Editar</a>
+                            <a th:href="@{'/vendedores/deletar/' + ${vendedor.id}}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Deseja realmente excluir este Vendedor?');">Excluir</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="/vendedores/cadastro" class="btn btn-primary">Novo Vendedor</a>
+        </div>
 </body>
+
 </html>

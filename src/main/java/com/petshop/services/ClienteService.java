@@ -1,46 +1,56 @@
 package com.petshop.services;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.petshop.model.Cliente;
 import com.petshop.repository.ClienteRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.List;
+
 
 @Service
 public class ClienteService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
-    // Listar todos os clientes
+    @Autowired
+    public ClienteService(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+    }
+
+    
+
     public List<Cliente> buscarTodosOsClientes() {
         return clienteRepository.findAll();
     }
 
-    public void salvarCliente(Cliente cliente) {
-        clienteRepository.save(cliente);
+    public Cliente buscarPorId(Integer id) { // ID é Integer
+        return clienteRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com ID: " + id));
     }
 
-    // Buscar um cliente por ID
-    public Optional<Cliente> buscarPorId(Long id) {
-        return clienteRepository.findById(id);
+
+    public Cliente salvarCliente(Cliente cliente) {
+        // Se for uma atualização, buscar o cliente existente e atualiza os campos exceto ID
+         if (cliente.getId() != null) {
+             Cliente existente = buscarPorId(cliente.getId());
+             existente.setNome(cliente.getNome());
+             existente.setEmail(cliente.getEmail());
+             existente.setTelefone(cliente.getTelefone());
+             existente.setEndereco(cliente.getEndereco());
+             if (cliente.getFotoPath() != null && !cliente.getFotoPath().isBlank()) {
+                 existente.setFotoPath(cliente.getFotoPath());
+             }
+             return clienteRepository.save(existente);
+         } else {
+            // Novo cliente
+            return clienteRepository.save(cliente);
+         }
     }
 
-    // Deletar um cliente
-    public void excluirClientePorId(Long id) {
+    public void excluirClientePorId(Integer id) {
         clienteRepository.deleteById(id);
     }
-
-    // Editar cliente (atualizar suas informações)
-    public Cliente atualizarCliente(Cliente cliente) {
-        if (cliente.getId() != null) {
-            return clienteRepository.save(cliente);  // aqui chamamos o método save acima
-        }
-        return null;
-    }
-
-
 }

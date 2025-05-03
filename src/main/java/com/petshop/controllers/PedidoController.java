@@ -1,11 +1,8 @@
 package com.petshop.controllers;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.petshop.model.ItemPedido;
 import com.petshop.model.Pedido;
-import com.petshop.model.Produto;
 import com.petshop.services.AnimalService;
 import com.petshop.services.ClienteService;
 import com.petshop.services.PedidoService;
@@ -36,194 +32,197 @@ public class PedidoController {
     private final ProdutoService produtoService;
     private final VendedorService vendedorService;
     private final ClienteService clienteService;
+    private final AnimalService animalService; // Adicionar AnimalService
 
     @Autowired
     public PedidoController(PedidoService pedidoService, ProdutoService produtoService,
-                           VendedorService vendedorService, ClienteService clienteService,
-                           AnimalService animalService) {
+            VendedorService vendedorService, ClienteService clienteService,
+            AnimalService animalService) { // Injetar AnimalService
         this.pedidoService = pedidoService;
         this.produtoService = produtoService;
         this.vendedorService = vendedorService;
         this.clienteService = clienteService;
+        this.animalService = animalService; // Atribuir
     }
 
+    // ... (listarTodos, visualizar - sem mudanças) ...
+
     @GetMapping
-    public String listarTodos(Model model) {
-        List<Pedido> pedidos = pedidoService.listarTodos();
-        model.addAttribute("pedidos", pedidos);
+    public String listarPedidos(Model model) {
+        model.addAttribute("pedidos", pedidoService.listarTodos());
         return "pedidos/lista";
     }
 
-    @GetMapping("/{numeroPedido}")
-    public String visualizar(@PathVariable Integer numeroPedido, Model model) {
-        Pedido pedido = pedidoService.buscarPorId(numeroPedido);
-        model.addAttribute("pedido", pedido);
-        return "pedidos/visualizar";
-    }
-
     @GetMapping("/novo")
-    public String iniciarNovoPedido(Model model, HttpSession session) {
-        // Cria um novo pedido com a data atual
+    public String iniciarNovoPedido(HttpSession session, RedirectAttributes redirectAttributes) {
+        // Cria um novo pedido com valores padrão
         Pedido novoPedido = new Pedido();
-        novoPedido.setDataEHora(LocalDateTime.now());
+        novoPedido.setDataHora(LocalDateTime.now());
         novoPedido.setDesconto(0.0);
-        
-        // Salva o pedido para gerar o número automático
-        novoPedido = pedidoService.salvar(novoPedido);
-        
-        // Coloca o pedido na sessão para uso durante o processo de criação
-        session.setAttribute("pedidoAtual", novoPedido);
-        
-        // Configura o modelo para a página de formulário de itens
-        model.addAttribute("pedido", novoPedido);
-        model.addAttribute("itemPedido", new ItemPedido());
-        model.addAttribute("produtos", produtoService.buscarTodosOsProdutos());
-        model.addAttribute("vendedores", vendedorService.buscarTodosOsVendedores());
-        model.addAttribute("clientes", clienteService.buscarTodosOsClientes());
-        
-        return "pedidos/adicionar-itens";
-    }
-    
-    @PostMapping("/adicionar-item")
-    public String adicionarItem(@ModelAttribute ItemPedido itemPedido, HttpSession session, RedirectAttributes redirectAttributes) {
-        try {
-            // Recupera o pedido da sessão
-            Pedido pedido = (Pedido) session.getAttribute("pedidoAtual");
-            
-            if (pedido == null) {
-                redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada. Por favor, inicie um novo pedido.");
-                return "redirect:/pedidos/novo";
-            }
-            
-            // Configura o item com o pedido atual
-            itemPedido.setPedido(pedido);
-            
-            // Carrega os objetos completos a partir dos IDs
 
-            Produto produto = produtoService.buscarPorId(itemPedido.getProduto().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + itemPedido.getProduto().getId()));
-            
-            // Define o preço unitário com base no produto se não for especificado
-            if (itemPedido.getPrecoUnitario() == null || itemPedido.getPrecoUnitario() == 0.0) {
-                itemPedido.setPrecoUnitario(produto.getPreco());
-            }
-            
-            // Adiciona o item ao pedido
-            pedido.adicionarItem(itemPedido);
-            
-            // Atualiza o pedido no banco de dados
-            pedidoService.atualizar(pedido.getNumeroPedido(), pedido);
-            
-            // Atualiza o pedido na sessão
-            session.setAttribute("pedidoAtual", pedido);
-            
-            redirectAttributes.addFlashAttribute("mensagemSucesso", "Item adicionado com sucesso!");
+        try {
+            // Salva o pedido inicial para obter o ID
+            novoPedido = pedidoService.salvar(novoPedido);
+
+            // Coloca o ID do pedido na sessão (mais leve que o objeto inteiro)
+            session.setAttribute("pedidoAtualId", novoPedido.getNumeroPedido());
+
+            // Redireciona para a tela de edição/adição de itens
+            return "redirect:/pedidos/editar-itens";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao adicionar item: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao iniciar novo pedido: " + e.getMessage());
+            return "redirect:/pedidos";
         }
-        
-        return "redirect:/pedidos/editar-itens";
     }
-    
+
     @GetMapping("/editar-itens")
     public String editarItens(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        // Recupera o pedido da sessão
-        Pedido pedido = (Pedido) session.getAttribute("pedidoAtual");
-        
-        if (pedido == null) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada. Por favor, inicie um novo pedido.");
+        Integer pedidoId = (Integer) session.getAttribute("pedidoAtualId");
+
+        if (pedidoId == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    "Nenhum pedido em andamento. Por favor, inicie um novo pedido.");
+            return "redirect:/pedidos"; // Ou /pedidos/novo
+        }
+
+        try {
+            Pedido pedido = pedidoService.buscarPorId(pedidoId);
+
+            model.addAttribute("pedido", pedido);
+            model.addAttribute("itemPedido", new ItemPedido()); // Para o form de novo item
+            model.addAttribute("produtos", produtoService.buscarTodosOsProdutos());
+            model.addAttribute("vendedores", vendedorService.buscarTodosOsVendedores());
+            model.addAttribute("clientes", clienteService.buscarTodosOsClientes());
+            model.addAttribute("animais", animalService.buscarTodosOsAnimais()); // Lista de animais
+
+            return "pedidos/adicionar-itens"; // Nome da view para adicionar/editar itens
+
+        } catch (EntityNotFoundException e) {
+            session.removeAttribute("pedidoAtualId"); // Limpa sessão inválida
+            redirectAttributes.addFlashAttribute("mensagemErro", "Pedido não encontrado. Iniciando um novo.");
+            return "redirect:/pedidos/novo";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao carregar pedido: " + e.getMessage());
+            return "redirect:/pedidos";
+        }
+    }
+
+    @PostMapping("/adicionar-item")
+    public String adicionarItem(@ModelAttribute ItemPedido itemPedido, // Thymeleaf deve popular os IDs: produto.id,
+                                                                       // vendedor.id, cliente.id, animal.id
+            @RequestParam("quantidade") Integer quantidade,
+            @RequestParam(value = "precoUnitario", required = false) Double precoUnitario, // Preço pode vir do form ou
+                                                                                           // ser pego do produto
+            HttpSession session, RedirectAttributes redirectAttributes) {
+
+        Integer pedidoId = (Integer) session.getAttribute("pedidoAtualId");
+        if (pedidoId == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    "Sessão de pedido expirada. Por favor, inicie um novo pedido.");
             return "redirect:/pedidos/novo";
         }
-        
-        // Atualiza o pedido com a versão mais recente do banco de dados
-        pedido = pedidoService.buscarPorId(pedido.getNumeroPedido());
-        session.setAttribute("pedidoAtual", pedido);
-        
-        // Configura o modelo para a página
-        model.addAttribute("pedido", pedido);
-        model.addAttribute("itemPedido", new ItemPedido());
-        model.addAttribute("produtos", produtoService.buscarTodosOsProdutos());
-        model.addAttribute("vendedores", vendedorService.buscarTodosOsVendedores());
-        model.addAttribute("clientes", clienteService.buscarTodosOsClientes());
-        
-        return "pedidos/adicionar-itens";
-    }
-    
-    @GetMapping("/remover-item/{itemId}")
-    public String removerItem(@PathVariable Long itemId, HttpSession session, RedirectAttributes redirectAttributes) {
+
         try {
-            // Recupera o pedido da sessão
-            Pedido pedido = (Pedido) session.getAttribute("pedidoAtual");
-            
-            if (pedido == null) {
-                redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada. Por favor, inicie um novo pedido.");
-                return "redirect:/pedidos/novo";
-            }
-            
-            // Remove o item do pedido (pode precisar de implementação específica)
-            pedidoService.removerItem(pedido.getNumeroPedido(), itemId);
-            
-            // Atualiza o pedido na sessão
-            pedido = pedidoService.buscarPorId(pedido.getNumeroPedido());
-            session.setAttribute("pedidoAtual", pedido);
-            
-            redirectAttributes.addFlashAttribute("mensagemSucesso", "Item removido com sucesso!");
+            // Seta os atributos que não vêm diretamente do @ModelAttribute
+            itemPedido.setQuantidade(quantidade);
+            itemPedido.setPrecoUnitario(precoUnitario); // Service vai tratar se for null
+
+            // O service agora valida e busca as entidades
+            pedidoService.adicionarItemAoPedido(pedidoId, itemPedido);
+
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Item adicionado com sucesso!");
+
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao adicionar item: " + e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao remover item: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensagemErro",
+                    "Erro inesperado ao adicionar item: " + e.getMessage());
+            // Logar erro e.printStackTrace();
         }
-        
+
+        return "redirect:/pedidos/editar-itens"; // Volta para a tela de edição
+    }
+
+    @GetMapping("/remover-item/{itemId}")
+    public String removerItem(@PathVariable Integer itemId, // ID do ItemPedido é Long
+            HttpSession session, RedirectAttributes redirectAttributes) {
+
+        Integer pedidoId = (Integer) session.getAttribute("pedidoAtualId");
+        if (pedidoId == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada.");
+            return "redirect:/pedidos/novo";
+        }
+
+        try {
+            pedidoService.removerItem(pedidoId, itemId);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Item removido com sucesso!");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao remover item: " + e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro inesperado ao remover item: " + e.getMessage());
+            // Logar erro
+        }
+
         return "redirect:/pedidos/editar-itens";
     }
-    
+
     @PostMapping("/finalizar")
-    public String finalizarPedido(@RequestParam(required = false) Double desconto, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String finalizarPedido(@RequestParam(required = false) Double desconto, // Desconto pode vir do form
+            HttpSession session, RedirectAttributes redirectAttributes) {
+
+        Integer pedidoId = (Integer) session.getAttribute("pedidoAtualId");
+        if (pedidoId == null) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada.");
+            return "redirect:/pedidos/novo";
+        }
+
         try {
-            // Recupera o pedido da sessão
-            Pedido pedido = (Pedido) session.getAttribute("pedidoAtual");
-            
-            if (pedido == null) {
-                redirectAttributes.addFlashAttribute("mensagemErro", "Sessão de pedido expirada. Por favor, inicie um novo pedido.");
-                return "redirect:/pedidos/novo";
-            }
-            
-            // Aplica o desconto se houver
-            if (desconto != null) {
+            Pedido pedido = pedidoService.buscarPorId(pedidoId);
+
+            // Aplica desconto se informado
+            if (desconto != null && desconto >= 0) {
                 pedido.setDesconto(desconto);
+                pedidoService.salvar(pedido); // Salva o pedido com o desconto atualizado
             }
-            
-            // Finaliza o pedido
-            pedidoService.atualizar(pedido.getNumeroPedido(), pedido);
-            
-            // Remove o pedido da sessão
-            session.removeAttribute("pedidoAtual");
-            
-            redirectAttributes.addFlashAttribute("mensagemSucesso", "Pedido #" + pedido.getNumeroPedido() + " finalizado com sucesso!");
-            return "redirect:/pagamentos/novo?pedidoId=" + pedido.getNumeroPedido();
+
+            // Remove o ID da sessão para indicar que o pedido foi finalizado
+            session.removeAttribute("pedidoAtualId");
+
+            redirectAttributes.addFlashAttribute("mensagemSucesso",
+                    "Pedido #" + pedidoId + " finalizado! Proceda para o pagamento.");
+            // Redireciona para a tela de novo pagamento, passando o ID do pedido
+            return "redirect:/pagamentos/novo?pedidoId=" + pedidoId;
+
+        } catch (EntityNotFoundException e) {
+            session.removeAttribute("pedidoAtualId");
+            redirectAttributes.addFlashAttribute("mensagemErro", "Pedido não encontrado para finalizar.");
+            return "redirect:/pedidos";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao finalizar pedido: " + e.getMessage());
-            return "redirect:/pedidos/editar-itens";
+            return "redirect:/pedidos/editar-itens"; // Volta para edição em caso de erro
         }
     }
-    
+
     @GetMapping("/cancelar")
     public String cancelarPedido(HttpSession session, RedirectAttributes redirectAttributes) {
-        try {
-            // Recupera o pedido da sessão
-            Pedido pedido = (Pedido) session.getAttribute("pedidoAtual");
-            
-            if (pedido != null) {
-                // Cancela o pedido (exclui do banco)
-                pedidoService.excluir(pedido.getNumeroPedido());
-                
-                // Remove o pedido da sessão
-                session.removeAttribute("pedidoAtual");
-                
-                redirectAttributes.addFlashAttribute("mensagemSucesso", "Pedido cancelado com sucesso!");
+        Integer pedidoId = (Integer) session.getAttribute("pedidoAtualId");
+
+        if (pedidoId != null) {
+            try {
+                pedidoService.excluir(pedidoId); // Exclui o pedido do banco
+                session.removeAttribute("pedidoAtualId"); // Limpa a sessão
+                redirectAttributes.addFlashAttribute("mensagemSucesso",
+                        "Pedido #" + pedidoId + " cancelado com sucesso!");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("mensagemErro",
+                        "Erro ao cancelar pedido #" + pedidoId + ": " + e.getMessage());
+                // Logar erro
             }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao cancelar pedido: " + e.getMessage());
+        } else {
+            redirectAttributes.addFlashAttribute("mensagemInfo", "Nenhum pedido em andamento para cancelar.");
         }
-        
-        return "redirect:/pedidos";
+
+        return "redirect:/pedidos"; // Volta para a lista de pedidos
     }
+
 }

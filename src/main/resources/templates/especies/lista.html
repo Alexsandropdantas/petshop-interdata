@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Lista de especie</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/estilo.css" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="fragmentos/menu-lateral :: sidebar"></div>
+    <div class="centralizado">
+        <div class="container">
+            <h2>Lista de Espécie</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome da Espécie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="especie : ${especies}">
+                        <td th:text="${especie.id}"></td>
+                        <td th:text="${especie.nome}"></td>
+                        <td>
+                            <a th:href="@{'/especies/editar/' + ${especie.id}}"
+                                class="btn btn-warning btn-sm">Editar</a>
+                            <a th:href="@{'/especies/deletar/' + ${especie.id}}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Deseja realmente excluir esta espécie?');">Excluir</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{'/especies/cadastro'}" class="btn btn-primary">Cadastrar nova Espécie</a>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+</body>
+
+</html>

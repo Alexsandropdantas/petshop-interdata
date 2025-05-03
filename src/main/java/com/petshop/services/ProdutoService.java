@@ -1,48 +1,73 @@
 package com.petshop.services;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.petshop.model.Categoria;
 import com.petshop.model.Produto;
 import com.petshop.repository.ProdutoRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+    private final ProdutoRepository produtoRepository;
+    private final CategoriaService categoriaService; // Para buscar categoria
 
-    // Listar todos os produtos
+    // Usar @Lazy para quebrar dependência circular se CategoriaService também depender de ProdutoService
+    public ProdutoService(ProdutoRepository produtoRepository, @Lazy CategoriaService categoriaService) {
+        this.produtoRepository = produtoRepository;
+        this.categoriaService = categoriaService;
+    }
+
     public List<Produto> buscarTodosOsProdutos() {
         return produtoRepository.findAll();
     }
 
-    // diferença entre salvar e editar é que se salvar passando o id atualiza
-    // salvar sem id o banco de dado vai gerar um registro novo do produto
-    public void salvarProduto(Produto produto) {
-        produtoRepository.save(produto); 
-    }
-
-    // Buscar um produto por ID no JPA Repository
-    public Optional<Produto> buscarPorId(Long id) {
+    public Optional<Produto> buscarPorId(Integer id) { // Usar Integer
         return produtoRepository.findById(id);
     }
 
-    // Deletar um produto por ID no JPA Repository
-    public void excluirProdutoPorId(Long id) {
+    public Produto buscarPorIdOuFalhar(Integer id) { // Usar Integer
+        return buscarPorId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + id));
+    }
+
+    public Produto salvarProduto(Produto produto) {
+        // Validar e anexar Categoria
+        if (produto.getCategoria() == null || produto.getCategoria().getId() == null) {
+            throw new IllegalArgumentException("Categoria é obrigatória para o produto.");
+        }
+        Categoria categoria = categoriaService.buscarPorIdOuFalhar(produto.getCategoria().getId());
+        produto.setCategoria(categoria);
+
+        if (produto.getPreco() == null || produto.getPreco() < 0) {
+             throw new IllegalArgumentException("Preço do produto não pode ser negativo.");
+        }
+
+        // Lógica de atualização vs criação
+        if (produto.getId() != null) {
+            Produto existente = buscarPorIdOuFalhar(produto.getId());
+            existente.setNome(produto.getNome());
+            existente.setPreco(produto.getPreco());
+            existente.setCategoria(produto.getCategoria()); // Atualiza categoria
+            if (produto.getFotoPath() != null && !produto.getFotoPath().isBlank()) {
+                existente.setFotoPath(produto.getFotoPath());
+            }
+            return produtoRepository.save(existente);
+        } else {
+            return produtoRepository.save(produto);
+        }
+    }
+
+    public void excluirProdutoPorId(Integer id) { // Usar Integer
+        if (!produtoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Produto não encontrado com ID: " + id);
+        }
+        // Adicionar verificação de dependência (Itens de Pedido, Estoque) se necessário
         produtoRepository.deleteById(id);
     }
-
-    // Editar produto (atualizar suas informações)
-    public Produto atualizarProduto(Produto produto) {
-        if (produto.getId() != null) {
-            return produtoRepository.save(produto);  // aqui chamamos o método save acima
-        }
-        return null;
-    }
-
-
 }

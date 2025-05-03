@@ -1,13 +1,6 @@
 package com.petshop.model;
 
-
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
+import java.util.Objects;
 
 import jakarta.persistence.*;
 
@@ -15,155 +8,158 @@ import jakarta.persistence.*;
 @Table(name = "itens_de_pedidos")
 public class ItemPedido {
 
+    // ID Próprio - NECESSÁRIO para JPA mapear como entidade, mas não está no schema
+    // original.
+    // Assumindo que a tabela pode ser alterada para incluir um ID ou que uma chave
+    // composta seria usada (@EmbeddedId)
+    // A abordagem mais simples compatível com o controller é adicionar um ID.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @ManyToOne
-    @JoinColumn(name = "fk_pedidos_numero_pedido", nullable = false)
+    private Integer id; // Usando Integer aqui, pois o controller usa Integer itemId
+
+    // --- Foreign Keys mapeadas como ManyToOne ---
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_pedidos_numero_pedido")
     private Pedido pedido;
-    
-    @ManyToOne
-    @JoinColumn(name = "fk_produtos_id", nullable = false)
-    private Produto produto;
-    
-    @ManyToOne
-    @JoinColumn(name = "fk_vendedores_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_vendedores_id")
     private Vendedor vendedor;
-    
-    @ManyToOne
-    @JoinColumn(name = "fk_clientes_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_produtos_id")
+    private Produto produto;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_clientes_id")
     private Cliente cliente;
-    
-    @ManyToOne
-    @JoinColumn(name = "fk_animais_id")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_animais_id", nullable = true) // Permitir nulo se o item não for para um animal específico
     private Animal animal;
-    
-    @Column(name = "quantidade", nullable = false)
-    private Integer quantidade;
-    
-    @Column(name = "preco_unitario", nullable = false)
+
+    // Atributos adicionais que geralmente existem em itens de pedido
+    // (Não estão na tabela itens_da_venda, mas são necessários para a lógica)
+    // Se não puder adicionar colunas, estes valores teriam que ser
+    // calculados/buscados de outra forma
+    @Column(name = "quantidade")
+    private Integer quantidade = 1;
+
+    @Column(name = "preco_unitario")
     private Double precoUnitario;
-    
-    @Transient
-    private Double subtotal;
-    
-    // Construtores
+
+    // --- Construtores
     public ItemPedido() {
-        this.quantidade = 1;
     }
-    
-    public ItemPedido(Pedido pedido, Produto produto, Vendedor vendedor, Cliente cliente, Animal animal, Integer quantidade, Double precoUnitario) {
+
+    public ItemPedido(Integer id, Pedido pedido, Vendedor vendedor, Produto produto, Cliente cliente, Animal animal,
+            Integer quantidade, Double precoUnitario) {
+        this.id = id;
         this.pedido = pedido;
-        this.produto = produto;
         this.vendedor = vendedor;
+        this.produto = produto;
         this.cliente = cliente;
         this.animal = animal;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
     }
-    
-    // Getters e Setters
-    public Long getId() {
+
+    // Getters, Setters
+    public Integer getId() {
         return id;
     }
-    
-    public void setId(Long id) {
+
+    public void setId(Integer id) {
         this.id = id;
     }
-    
+
     public Pedido getPedido() {
         return pedido;
     }
-    
+
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
-    
-    public Produto getProduto() {
-        return produto;
-    }
-    
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-        if (produto != null && this.precoUnitario == null) {
-            this.precoUnitario = produto.getPreco();
-        }
-    }
-    
+
     public Vendedor getVendedor() {
         return vendedor;
     }
-    
+
     public void setVendedor(Vendedor vendedor) {
         this.vendedor = vendedor;
     }
-    
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
     public Cliente getCliente() {
         return cliente;
     }
-    
+
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-    
+
     public Animal getAnimal() {
         return animal;
     }
-    
+
     public void setAnimal(Animal animal) {
         this.animal = animal;
     }
-    
+
     public Integer getQuantidade() {
         return quantidade;
     }
-    
+
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
     }
-    
+
     public Double getPrecoUnitario() {
         return precoUnitario;
     }
-    
+
     public void setPrecoUnitario(Double precoUnitario) {
         this.precoUnitario = precoUnitario;
     }
-    
+
+    // Método utilitário para calcular subtotal
     public Double getSubtotal() {
-        if (quantidade != null && precoUnitario != null) {
-            return quantidade * precoUnitario;
+        if (precoUnitario != null && quantidade != null) {
+            return precoUnitario * quantidade;
         }
         return 0.0;
     }
-    
-    // Equals e HashCode
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ItemPedido that = (ItemPedido) o;
-        
-        return id != null ? id.equals(that.id) : that.id == null;
+        return Objects.equals(id, that.id); // Baseado no ID gerado
     }
-    
+
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return Objects.hash(id); // Baseado no ID gerado
     }
-    
-    // ToString
+
     @Override
     public String toString() {
         return "ItemPedido{" +
                 "id=" + id +
-                ", produto=" + (produto != null ? produto.getNome() : "null") +
+                ", produtoId=" + (produto != null ? produto.getId() : "null") +
                 ", quantidade=" + quantidade +
                 ", precoUnitario=" + precoUnitario +
                 '}';
     }
-
-
 }

@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Cadastro de Pedidos</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
-    <link href="../../css/estilo.css" rel="stylesheet">      
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/estilo.css" rel="stylesheet">
 
 </head>
+
 <body>
     <div th:replace="fragmentos/menu-lateral :: sidebar"></div>
     <div class="centralizado">
-<div class="container">
-    <h2>Cadastro de Pedidos</h2>
-    <form th:action="@{'/pedidos/editar/' + ${pedido.id}}"  method="post">
-        <div class="mb-3">
-            <label  class="form-label">Número de Pedido</label>
-            <input type="text" th:value="${pedido.numeroPedido}" class="form-control" name="numeroPedido" required>
+        <div class="container">
+            <h2>Cadastro de Pedidos</h2>
+            <form th:action="@{'/pedidos/editar/' + ${pedido.id}}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Número de Pedido</label>
+                    <input type="text" th:value="${pedido.numeroPedido}" class="form-control" name="numeroPedido"
+                        required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Data e Hora</label>
+                    <input type="text" th:value="${pedido.dataHora}" class="form-control" name="dataHora" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Atualizar</button>
+            </form>
         </div>
-        <div class="mb-3">
-            <label  class="form-label">Data e Hora</label>
-            <input type="text" th:value="${pedido.dataHora}" class="form-control"  name="dataHora" required>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Atualizar</button>
-    </form>
-</div>
 </body>
+
 </html>

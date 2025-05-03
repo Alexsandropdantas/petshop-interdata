@@ -11,17 +11,25 @@
     <div class="centralizado">
 <div class="container">
     <h2>Cadastro de Raças</h2>
-    <form th:action="@{'/racas/editar/' + ${raca.id}}"  method="post">
+    <form th:action="@{'/racas/editar/' + ${raca.id}}" th:object="${raca}" method="post">
+        <input type="hidden" th:field="*{id}" /> 
         <div class="mb-3">
-            <label  class="form-label">Id</label>
-            <input type="text" th:value="${raca.id}" class="form-control" name="Id" required>
+            <label for="nome" class="form-label">Nome da Raça</label>
+            <input type="text" id="nome" th:field="*{nome}" class="form-control" required>
         </div>
+
         <div class="mb-3">
-            <label  class="form-label">Nome da Raça</label>
-            <input type="text" th:value="${raca.nome}" class="form-control"  name="Nome" required>
+            <label for="especie" class="form-label">Espécie</label>
+            <select id="especieId" name="especieId" class="form-select" required>
+                <option th:each="especie : ${especies}"
+                        th:value="${especie.id}"   
+                        th:text="${especie.nome}">
+                </option>
+            </select>
         </div>
-        
+
         <button type="submit" class="btn btn-primary">Atualizar</button>
+         <a th:href="@{/racas}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 </body>

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.petshop.model.ItemPedido;
 
 @Repository
-public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Long> {
+public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Integer> {
     List<ItemPedido> findByPedidoNumeroPedido(Integer numeroPedido);
+
 }

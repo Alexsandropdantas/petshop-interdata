@@ -1,77 +1,85 @@
 package com.petshop.controllers;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.petshop.model.Vendedor;
-import com.petshop.services.VendedorService; 
+import com.petshop.services.VendedorService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Controller
+@RequestMapping("/vendedores")
 public class VendedorController {
 
     @Autowired
     private VendedorService vendedorService;
 
-    @Value("${imagens.vendedores.path}")
-    private String imagesPath;
-
-    @GetMapping("/vendedores")
+    @GetMapping
     public String listarVendedores(Model model) {
-        model.addAttribute("vendedores", vendedorService.buscarTodosOsVendedores()); // Corrigido o uso de vendedorService
+        model.addAttribute("vendedores", vendedorService.buscarTodosOsVendedores());
         return "vendedores/lista";
     }
 
-    @GetMapping("/vendedores/cadastro")
-    public String exibirFormularioCadastro() {
+    @GetMapping("/cadastro")
+    public String exibirFormularioCadastro(Model model) {
+        model.addAttribute("vendedor", new Vendedor());
         return "vendedores/cadastro";
     }
 
-    @GetMapping("/vendedores/editar/{id}")
-    public String editarVendedor(@PathVariable Long id, Model model) {
-        Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new IllegalArgumentException("ID vendedor inválido: " + id));
-        model.addAttribute("vendedor", vendedor);
-        return "vendedores/editar"; // Corrigido a rota para "vendedores/editar"
-    }
-
-    @PostMapping("/vendedores/editar/{id}")
-    public String atualizarVendedor(@PathVariable Long id, @ModelAttribute Vendedor vendedorAtualizado) {
-        Vendedor vendedor = vendedorService.buscarPorId(id).orElseThrow(() -> new IllegalArgumentException("ID vendedor inválido: " + id));
-        vendedor.setNome(vendedorAtualizado.getNome());
-        vendedor.setEmail(vendedorAtualizado.getEmail());
-        vendedor.setTelefone(vendedorAtualizado.getTelefone());
-        vendedor.setEndereco(vendedorAtualizado.getEndereco());
-        vendedorService.salvarVendedor(vendedor); // Corrigido método de salvar
-        return "redirect:/vendedores";
-    }
-
-    @GetMapping("/vendedores/deletar/{id}")
-    public String deletarVendedor(@PathVariable Long id) {
-        vendedorService.excluirVendedorPorId(id);
-        return "redirect:/vendedores";
-    }
-
-    @PostMapping("/vendedores")
-    public String salvarVendedor(@ModelAttribute Vendedor vendedor, @RequestParam("foto") MultipartFile foto) throws IOException {
-        if (!foto.isEmpty()) {
-            String nomeArquivo = foto.getOriginalFilename();  // adicionar uma chave tipo data e hora
-            Path caminho = Paths.get(imagesPath + nomeArquivo);
-            Files.copy(foto.getInputStream(), caminho);
-            vendedor.setFotoPath(caminho.toString());
+    @PostMapping
+    public String salvarVendedor(@ModelAttribute Vendedor vendedor, RedirectAttributes redirectAttributes) {
+        try {
+            vendedorService.salvarVendedor(vendedor);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Vendedor salvo com sucesso!");
+            return "redirect:/vendedores";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao salvar vendedor: " + e.getMessage());
+            return "vendedores/cadastro";
         }
-        vendedorService.salvarVendedor(vendedor); // Corrigido método de salvar
+    }
+
+    @GetMapping("/editar/{id}")
+    public String exibirFormularioEdicao(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            Vendedor vendedor = vendedorService.buscarPorIdOuFalhar(id);
+            model.addAttribute("vendedor", vendedor);
+            return "vendedores/editar";
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Vendedor não encontrado com ID: " + id);
+            return "redirect:/vendedores";
+        }
+    }
+
+    @PostMapping("/editar/{id}")
+    public String atualizarVendedor(@PathVariable Integer id, @ModelAttribute Vendedor vendedor,
+            RedirectAttributes redirectAttributes) {
+        try {
+            vendedor.setId(id);
+            vendedorService.salvarVendedor(vendedor);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Vendedor atualizado com sucesso!");
+            return "redirect:/vendedores";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao atualizar vendedor: " + e.getMessage());
+            return "redirect:/vendedores/editar/" + id;
+        }
+    }
+
+    @GetMapping("/deletar/{id}")
+    public String deletarVendedor(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            vendedorService.excluirVendedorPorId(id);
+            redirectAttributes.addFlashAttribute("mensagemSucesso", "Vendedor excluído com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao excluir vendedor: " + e.getMessage());
+        }
         return "redirect:/vendedores";
     }
 }
