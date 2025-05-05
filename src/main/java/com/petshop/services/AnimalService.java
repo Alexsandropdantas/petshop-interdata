@@ -28,12 +28,8 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public Optional<Animal> buscarPorId(Integer id) {
-        return animalRepository.findById(id);
-    }
-
-    public Animal buscarPorIdOuFalhar(Integer id) {
-        return buscarPorId(id)
+    public Animal buscarPorId(Integer id) {
+        return animalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Animal não encontrado com ID: " + id));
     }
 
@@ -55,7 +51,7 @@ public class AnimalService {
 
         // Lógica para atualização e criação de novo animal
         if (animal.getId() != null) {
-            Animal existente = buscarPorIdOuFalhar(animal.getId());
+            Animal existente = buscarPorId(animal.getId());
             existente.setNome(animal.getNome());
             existente.setDataDeNascimento(animal.getDataDeNascimento());
             existente.setCliente(animal.getCliente());

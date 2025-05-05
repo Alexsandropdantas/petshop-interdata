@@ -47,7 +47,7 @@ public class ProdutoController {
     @GetMapping("/editar/{id}")
     public String exibirFormularioEdicao(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Produto produto = produtoService.buscarPorIdOuFalhar(id);
+            Produto produto = produtoService.buscarPorId(id);
             model.addAttribute("produto", produto);
             model.addAttribute("categorias", categoriaService.buscarTodosAsCategorias());
             return "produtos/editar";
@@ -114,8 +114,7 @@ public class ProdutoController {
 
             // Lida com a foto apenas se uma nova foi enviada
             if (foto != null && !foto.isEmpty()) {
-                String nomeArquivo = System.currentTimeMillis() + "_"
-                        + foto.getOriginalFilename().replaceAll("[^a-zA-Z0-9.-]", "_");
+                String nomeArquivo = System.currentTimeMillis() + "_"+ foto.getOriginalFilename().replaceAll("[^a-zA-Z0-9.-]", "_");
                 Path diretorioPath = Paths.get(imagesPath);
                 Files.createDirectories(diretorioPath);
                 Path caminhoArquivo = diretorioPath.resolve(nomeArquivo);
@@ -123,7 +122,7 @@ public class ProdutoController {
                 produtoAtualizado.setFotoPath(caminhoArquivo.toString());
             } else {
                 // Mantém a foto existente
-                Produto produtoExistente = produtoService.buscarPorIdOuFalhar(id);
+                Produto produtoExistente = produtoService.buscarPorId(id);
                 produtoAtualizado.setFotoPath(produtoExistente.getFotoPath());
             }
 

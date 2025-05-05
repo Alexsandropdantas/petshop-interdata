@@ -49,7 +49,7 @@ public class VendedorController {
     @GetMapping("/editar/{id}")
     public String exibirFormularioEdicao(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Vendedor vendedor = vendedorService.buscarPorIdOuFalhar(id);
+            Vendedor vendedor = vendedorService.buscarPorId(id);
             model.addAttribute("vendedor", vendedor);
             return "vendedores/editar";
         } catch (EntityNotFoundException e) {

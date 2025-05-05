@@ -88,8 +88,7 @@ public class AnimalController {
 
     @GetMapping("/editar/{id}")
     public String editarAnimal(@PathVariable Integer id, Model model) {
-        Animal animal = animalService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
+        Animal animal = animalService.buscarPorId(id);
 
         model.addAttribute("animal", animal);
         model.addAttribute("clientes", clienteService.buscarTodosOsClientes()); // Permite alterar o cliente
@@ -100,8 +99,7 @@ public class AnimalController {
     public String atualizarAnimal(@PathVariable Integer id,
             @ModelAttribute Animal animalAtualizado,
             @RequestParam("clienteId") Integer clienteId) {
-        Animal animal = animalService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
+        Animal animal = animalService.buscarPorId(id);
 
         Cliente cliente = clienteService.buscarPorId(clienteId);
 

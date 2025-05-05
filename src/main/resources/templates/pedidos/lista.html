@@ -18,18 +18,24 @@
                 <thead>
                     <tr>
                         <th>Número de Pedido</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
                         <th>Data e Hora</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="pedido : ${pedidos}">
                         <td th:text="${pedido.numeroPedido}"></td>
-                        <td th:text="${#temporals.format(pedido.dataHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                        <td ></td>
+                        <td ></td>
+                        <td th:text="${#temporals.format(pedido.dataEHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
                         <td>
                             <a th:href="@{'/pedidos/editar/' + ${pedido.numeroPedido}}"
                                 class="btn btn-warning btn-sm">Editar</a>
                             <a th:href="@{'/pedidos/deletar/' + ${pedido.numeroPedido}}" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Deseja realmente excluir este pedido?');">Excluir</a>
+                            <a th:href="@{'/pagamentos/pedido/' + ${pedido.numeroPedido}}"
+                                class="btn btn-primary btn-sm">Pagar</a>
                         </td>
                     </tr>
                 </tbody>

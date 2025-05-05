@@ -27,14 +27,14 @@ public class Produto {
     private String fotoPath;
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedido> itensPedido = new ArrayList<>();
+    private List<ItemDePedido> itensPedido = new ArrayList<>();
 
     // --- Construtores
     public Produto() {
     }
 
     public Produto(Integer id, String nome, Double preco, Categoria categoria, String fotoPath,
-            List<ItemPedido> itensPedido) {
+            List<ItemDePedido> itensPedido) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
@@ -84,11 +84,11 @@ public class Produto {
         this.fotoPath = fotoPath;
     }
 
-    public List<ItemPedido> getItensPedido() {
+    public List<ItemDePedido> getItensPedido() {
         return itensPedido;
     }
 
-    public void setItensPedido(List<ItemPedido> itensPedido) {
+    public void setItensPedido(List<ItemDePedido> itensPedido) {
         this.itensPedido = itensPedido;
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
-    List<Pedido> findByDataHoraBetween(LocalDateTime dataInicio, LocalDateTime dataFim);
+    List<Pedido> findByDataEHoraBetween(LocalDateTime dataInicio, LocalDateTime dataFim);
 
     // @Query("SELECT p FROM Pedido p WHERE p.pagamento IS NULL")
     // List<Pedido> findPedidosSemPagamento();

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -27,12 +26,8 @@ public class ProdutoService {
         return produtoRepository.findAll();
     }
 
-    public Optional<Produto> buscarPorId(Integer id) { // Usar Integer
-        return produtoRepository.findById(id);
-    }
-
-    public Produto buscarPorIdOuFalhar(Integer id) { // Usar Integer
-        return buscarPorId(id)
+    public Produto buscarPorId(Integer id) { // Usar Integer
+        return produtoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + id));
     }
 
@@ -50,7 +45,7 @@ public class ProdutoService {
 
         // Lógica de atualização vs criação
         if (produto.getId() != null) {
-            Produto existente = buscarPorIdOuFalhar(produto.getId());
+            Produto existente = buscarPorId(produto.getId());
             existente.setNome(produto.getNome());
             existente.setPreco(produto.getPreco());
             existente.setCategoria(produto.getCategoria()); // Atualiza categoria

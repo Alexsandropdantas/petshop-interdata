@@ -41,7 +41,7 @@ public class Cliente {
     private List<Animal> animais = new ArrayList<>();
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedido> itensPedido = new ArrayList<>();
+    private List<ItemDePedido> itensPedido = new ArrayList<>();
 
     // Construtores
     public Cliente() {

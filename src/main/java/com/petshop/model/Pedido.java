@@ -4,40 +4,46 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "pedidos")
 public class Pedido {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Assumindo que numero_pedido é auto-incrementável
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "numero_pedido")
     private Integer numeroPedido;
 
     @Column(name = "data_e_hora")
-    private LocalDateTime dataHora;
+    private LocalDateTime dataEHora;
 
-    @Column
-    private Double desconto;
+    // Relacionamento com ItensDePedido (um pedido tem muitos itens)
+    // cascade = CascadeType.ALL e orphanRemoval = true garantem que os itens
+    // são salvos/excluídos junto com o pedido
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ItemDePedido> itens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Pagamento> pagamentos = new ArrayList<>();
+    // Relacionamento com Cliente (opcional, pode estar no item)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_clientes_id")
+    private Cliente cliente;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedido> itens = new ArrayList<>();
+    // Relacionamento com Vendedor (opcional, pode estar no item)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_vendedores_id")
+    private Vendedor vendedor;
 
-    // --- Construtores
+    // Construtor
     public Pedido() {
     }
 
-    public Pedido(Integer numeroPedido, LocalDateTime dataHora, Double desconto, List<Pagamento> pagamentos,
-            List<ItemPedido> itens) {
+    public Pedido(Integer numeroPedido, LocalDateTime dataEHora, List<ItemDePedido> itens, Cliente cliente,
+            Vendedor vendedor) {
         this.numeroPedido = numeroPedido;
-        this.dataHora = dataHora;
-        this.desconto = desconto;
-        this.pagamentos = pagamentos;
+        this.dataEHora = dataEHora;
         this.itens = itens;
+        this.cliente = cliente;
+        this.vendedor = vendedor;
     }
 
     // Getters, Setters
@@ -49,79 +55,36 @@ public class Pedido {
         this.numeroPedido = numeroPedido;
     }
 
-    public Double getDesconto() {
-        return desconto;
+    public LocalDateTime getDataEHora() {
+        return dataEHora;
     }
 
-    public void setDesconto(Double desconto) {
-        this.desconto = desconto;
+    public void setDataEHora(LocalDateTime dataEHora) {
+        this.dataEHora = dataEHora;
     }
 
-    public List<Pagamento> getPagamentos() {
-        return pagamentos;
-    }
-
-    public void setPagamentos(List<Pagamento> pagamentos) {
-        this.pagamentos = pagamentos;
-    }
-
-    public List<ItemPedido> getItens() {
+    public List<ItemDePedido> getItens() {
         return itens;
     }
 
-    public void setItens(List<ItemPedido> itens) {
+    public void setItens(List<ItemDePedido> itens) {
         this.itens = itens;
     }
 
-    // Método utilitário para adicionar item (bidirecional)
-    public void adicionarItem(ItemPedido item) {
-        this.itens.add(item);
-        item.setPedido(this);
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    // Método utilitário para remover item (bidirecional)
-    public void removerItem(ItemPedido item) {
-        this.itens.remove(item);
-        item.setPedido(null);
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
-    // Método utilitário para calcular total (exemplo)
-    public Double calcularTotalBruto() {
-        return itens.stream()
-                .mapToDouble(item -> item.getPrecoUnitario() * item.getQuantidade()).sum();
+    public Vendedor getVendedor() {
+        return vendedor;
     }
 
-    public Double calcularTotalComDesconto() {
-        double totalBruto = calcularTotalBruto();
-        double valorDesconto = totalBruto * (this.desconto != null ? this.desconto / 100.0 : 0.0);
-        return totalBruto - valorDesconto;
+    public void setVendedor(Vendedor vendedor) {
+        this.vendedor = vendedor;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Pedido pedido = (Pedido) o;
-        return Objects.equals(numeroPedido, pedido.numeroPedido);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(numeroPedido);
-    }
-
-    @Override
-    public String toString() {
-        return "Pedido{" + "numeroPedido=" + numeroPedido + ", DataHora=" + dataHora + ", desconto=" + desconto + '}';
-    }
-
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
-
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
-    }
 }

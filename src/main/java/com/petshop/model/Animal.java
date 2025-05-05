@@ -44,7 +44,7 @@ public class Animal {
     private String fotoPath;
 
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedido> itensPedido = new ArrayList<>();
+    private List<ItemDePedido> itensPedido = new ArrayList<>();
 
     // --- Construtores
     public Animal() {
@@ -109,11 +109,11 @@ public class Animal {
         this.fotoPath = fotoPath;
     }
 
-    public List<ItemPedido> getItensPedido() {
+    public List<ItemDePedido> getItensPedido() {
         return itensPedido;
     }
 
-    public void setItensPedido(List<ItemPedido> itensPedido) {
+    public void setItensPedido(List<ItemDePedido> itensPedido) {
         this.itensPedido = itensPedido;
     }
 

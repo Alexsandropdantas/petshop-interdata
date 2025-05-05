@@ -23,7 +23,7 @@ public class Vendedor {
     private String email;
 
     @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ItemPedido> itensPedido = new ArrayList<>();
+    private List<ItemDePedido> itensPedido = new ArrayList<>();
 
     // --- Construtores
     public Vendedor() {
@@ -62,11 +62,11 @@ public class Vendedor {
         this.email = email;
     }
 
-    public List<ItemPedido> getItensPedido() {
+    public List<ItemDePedido> getItensPedido() {
         return itensPedido;
     }
 
-    public void setItensPedido(List<ItemPedido> itensPedido) {
+    public void setItensPedido(List<ItemDePedido> itensPedido) {
         this.itensPedido = itensPedido;
     }
 

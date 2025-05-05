@@ -1,6 +1,5 @@
 package com.petshop.controllers;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,7 @@ public class PagamentoController {
             Pedido pedido = pedidoService.buscarPorId(numeroPedido); // Busca o pedido para exibir detalhes
             List<Pagamento> pagamentos = pagamentoService.buscarPorPedido(numeroPedido);
             Double totalPago = pagamentoService.calcularTotalPagamentoPorPedido(numeroPedido);
-            Double totalPedido = pedido.calcularTotalComDesconto(); // Pega o total do pedido
+            Double totalPedido = 0.0;
             Double saldoDevedor = totalPedido - totalPago;
 
             model.addAttribute("pedido", pedido);
@@ -91,38 +90,12 @@ public class PagamentoController {
         }
     }
 
-    @GetMapping("/novo") // Para registrar um novo pagamento avulso ou vindo de um pedido
-    public String formNovo(@RequestParam(required = false) Integer pedidoId, Model model) {
-        Pagamento pagamento = new Pagamento();
-        List<Pedido> pedidos;
-        if (pedidoId != null) {
-            try {
-                Pedido pedido = pedidoService.buscarPorId(pedidoId);
-                pagamento.setPedido(pedido); // Pré-seleciona o pedido
-                pedidos = Collections.singletonList(pedido); // Mostra apenas este pedido na lista
-                model.addAttribute("pedidoSelecionadoId", pedidoId);
-            } catch (EntityNotFoundException e) {
-                // Pedido não encontrado, mostra todos
-                pedidos = pedidoService.listarTodos();
-                model.addAttribute("mensagemErro", "Pedido ID " + pedidoId + " não encontrado.");
-            }
-        } else {
-            pedidos = pedidoService.listarTodos(); // Mostra todos os pedidos se nenhum ID for passado
-        }
-
-        model.addAttribute("pagamento", pagamento);
-        model.addAttribute("pedidos", pedidos); // Lista de pedidos para seleção (pode ser grande)
-        model.addAttribute("formasPagamento", formaDePagamentoService.listarTodas());
-
-        return "pagamentos/form"; // Criar/Ajustar view (form.html)
-    }
-
     @GetMapping("/{id}/editar")
     public String formEditar(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
             Pagamento pagamento = pagamentoService.buscarPorId(id);
             model.addAttribute("pagamento", pagamento);
-            model.addAttribute("pedidos", pedidoService.listarTodos()); // Todos os pedidos para possível troca
+            model.addAttribute("pedidos", pedidoService.buscarTodosOsPedidos()); // Todos os pedidos para possível troca
             model.addAttribute("formasPagamento", formaDePagamentoService.listarTodas());
             model.addAttribute("pedidoSelecionadoId", pagamento.getPedido().getNumeroPedido()); // Marca o pedido atual
             model.addAttribute("formaSelecionadaId", pagamento.getFormaDePagamento().getId()); // Marca a forma atual
@@ -164,7 +137,7 @@ public class PagamentoController {
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao salvar pagamento: " + e.getMessage());
             // Volta para o formulário com os dados preenchidos
             model.addAttribute("pagamento", pagamento);
-            model.addAttribute("pedidos", pedidoService.listarTodos());
+            model.addAttribute("pedidos", pedidoService.buscarTodosOsPedidos());
             model.addAttribute("formasPagamento", formaDePagamentoService.listarTodas());
             model.addAttribute("pedidoSelecionadoId", pedidoId);
             model.addAttribute("formaSelecionadaId", formaPagamentoId);

@@ -7,7 +7,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VendedorService {
@@ -22,18 +21,15 @@ public class VendedorService {
         return vendedorRepository.findAll();
     }
 
-    public Optional<Vendedor> buscarPorId(Integer id) {
-        return vendedorRepository.findById(id);
-    }
-
-     public Vendedor buscarPorIdOuFalhar(Integer id) {
-        return buscarPorId(id)
+    public Vendedor buscarPorId(Integer id) {
+        return vendedorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vendedor não encontrado com ID: " + id));
     }
 
+
     public Vendedor salvarVendedor(Vendedor vendedor) {
         if (vendedor.getId() != null) {
-            Vendedor existente = buscarPorIdOuFalhar(vendedor.getId());
+            Vendedor existente = buscarPorId(vendedor.getId());
             existente.setNome(vendedor.getNome());
             existente.setEmail(vendedor.getEmail());
             existente.setTelefone(vendedor.getTelefone());
