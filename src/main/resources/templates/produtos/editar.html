@@ -26,15 +26,18 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="categoria" class="form-label">Categoria do Produto</label>
-                    <select class="form-select" name="categoria" id="categoria" required>
-                        <option value="" disabled selected>Selecione a Categoria</option>
-                        <option th:each="categoria : ${categorias}" th:value="${categoria.id}"
-                            th:text="${categoria.nome}"></option>
+                    <label for="categoriaId" class="form-label">Categoria do Produto</label>
+                    <select class="form-select" name="categoriaId" id="categoriaId" required>
+                        <option 
+                            th:each="categoria : ${categorias}" 
+                            th:value="${categoria.id}"
+                            th:text="${categoria.nome}"
+                            th:selected="${categoria.id == produto.categoria.id}"></option>
+                        </option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                <button type="submit" class="btn btn-primary">Atualizar</button>
             </form>
         </div>
 </body>

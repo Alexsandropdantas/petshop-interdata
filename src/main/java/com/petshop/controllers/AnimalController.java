@@ -65,8 +65,7 @@ public class AnimalController {
         Cliente cliente = clienteService.buscarPorId(clienteId);
         animal.setCliente(cliente); // Seta o Cliente na classe Animal
 
-        Raca raca = racaService.buscarPorId(racaId)
-                .orElseThrow(() -> new IllegalArgumentException("Raca inválida: " + racaId));
+        Raca raca = racaService.buscarPorId(racaId);
         animal.setRaca(raca); // Seta a Raça na classe Animal
 
         animal.setDataDeNascimento(dataDeNascimento);
@@ -91,22 +90,27 @@ public class AnimalController {
         Animal animal = animalService.buscarPorId(id);
 
         model.addAttribute("animal", animal);
-        model.addAttribute("clientes", clienteService.buscarTodosOsClientes()); // Permite alterar o cliente
+        model.addAttribute("clientes", clienteService.buscarTodosOsClientes());
+        model.addAttribute("racas", racaService.buscarTodasAsRacas());
         return "animais/editar";
     }
 
     @PostMapping("/editar/{id}")
     public String atualizarAnimal(@PathVariable Integer id,
             @ModelAttribute Animal animalAtualizado,
-            @RequestParam("clienteId") Integer clienteId) {
+            @RequestParam("clienteId") Integer clienteId,
+            @RequestParam("racaId") Integer racaId) {
+        
+        
         Animal animal = animalService.buscarPorId(id);
+        animal.setNome(animalAtualizado.getNome());
+        animal.setDataDeNascimento(animalAtualizado.getDataDeNascimento());
 
         Cliente cliente = clienteService.buscarPorId(clienteId);
-
-        animal.setNome(animalAtualizado.getNome());
-        animal.setRaca(animalAtualizado.getRaca());
-        animal.setDataDeNascimento(animalAtualizado.getDataDeNascimento());
         animal.setCliente(cliente); // Atualiza o cliente do animal
+
+        Raca raca = racaService.buscarPorId(racaId);
+        animal.setRaca(raca);
 
         animalService.salvarAnimal(animal);
         return "redirect:/animais";

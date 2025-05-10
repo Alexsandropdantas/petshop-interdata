@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.petshop.model.Animal;
+import com.petshop.model.Cliente;
 import com.petshop.model.ItemDePedido;
 import com.petshop.model.Pedido;
+import com.petshop.model.Produto;
+import com.petshop.model.Vendedor;
 import com.petshop.services.AnimalService;
 import com.petshop.services.ClienteService;
 import com.petshop.services.ItemDePedidoService;
@@ -93,8 +97,14 @@ public class PedidoController {
             @RequestParam("vendedorId") Integer vendedorId,
             RedirectAttributes redirectAttributes) {
 
+        Produto produto = produtoService.buscarPorId(produtoId);
+        Cliente cliente = clienteService.buscarPorId(clienteId);
+        Animal animal = animalService.buscarPorId(animalId);
+        Vendedor vendedor = vendedorService.buscarPorId(vendedorId);
+                
+
         try {
-            itemDePedidoService.adicionarItemDePedido(numeroPedido, produtoId, quantidade, clienteId, animalId, vendedorId, desconto);
+            itemDePedidoService.adicionarItemDePedido(numeroPedido, produto, quantidade, cliente, animal, vendedor, desconto);
         } catch (Exception e) {
             // Logar erro e retornar mensagem
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro ao adicionar item: " + e.getMessage());

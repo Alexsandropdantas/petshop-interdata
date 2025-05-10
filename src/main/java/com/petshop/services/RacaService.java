@@ -26,13 +26,9 @@ public class RacaService {
         return racaRepository.findAll();
     }
 
-    public Optional<Raca> buscarPorId(Integer id) {
-        return racaRepository.findById(id);
-    }
-
-     public Raca buscarPorIdOuFalhar(Integer id) {
-        return buscarPorId(id)
-                .orElseThrow(() -> new EntityNotFoundException("Raça não encontrada com ID: " + id));
+    public Raca buscarPorId(Integer id) {
+        return racaRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Raca não encontrado com ID: " + id));
     }
 
     public Raca salvarRaca(Raca raca) {
@@ -44,7 +40,7 @@ public class RacaService {
         raca.setEspecie(especie);
 
         if (raca.getId() != null) {
-            Raca existente = buscarPorIdOuFalhar(raca.getId());
+            Raca existente = buscarPorId(raca.getId());
             existente.setNome(raca.getNome());
             existente.setEspecie(raca.getEspecie()); // Atualiza especie
             return racaRepository.save(existente);

@@ -58,26 +58,22 @@ public class ItemDePedidoService {
         itemDePedidoRepository.deleteById(id);
     }
 
-    public void adicionarItemDePedido(Integer numeroPedido, Integer produtoId, Integer quantidade,
-            Integer clienteId, Integer animalId, Integer vendedorId, Double desconto) {
+    public void adicionarItemDePedido(Integer numeroPedido, Produto produto, Integer quantidade,
+            Cliente cliente, Animal animal, Vendedor vendedor, Double desconto) {
 
         ItemDePedido item = new ItemDePedido();
 
         Pedido pedido = pedidoService.buscarPorId(numeroPedido);
         item.setPedido(pedido);
 
-        Produto produto = produtoService.buscarPorId(produtoId);
         item.setProduto(produto);
 
         item.setQuantidade(quantidade);
 
-        Cliente cliente = clienteService.buscarPorId(clienteId);
         item.setCliente(cliente);
 
-        Animal animal = animalService.buscarPorId(animalId);
         item.setAnimal(animal);
 
-        Vendedor vendedor = vendedorService.buscarPorId(vendedorId);
         item.setVendedor(vendedor);
 
         item.setDesconto(desconto);

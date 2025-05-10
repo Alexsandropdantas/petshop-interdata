@@ -1,6 +1,7 @@
 package com.petshop.controllers;
 
 import com.petshop.comum.BibliotecaDeMetodosComunsAoSistema;
+import com.petshop.model.Animal;
 import com.petshop.model.Categoria;
 import com.petshop.model.Produto;
 import com.petshop.services.CategoriaService;
@@ -44,20 +45,7 @@ public class ProdutoController {
         return "produtos/cadastro";
     }
 
-    @GetMapping("/editar/{id}")
-    public String exibirFormularioEdicao(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            Produto produto = produtoService.buscarPorId(id);
-            model.addAttribute("produto", produto);
-            model.addAttribute("categorias", categoriaService.buscarTodosAsCategorias());
-            return "produtos/editar";
-        } catch (EntityNotFoundException e) {
-            redirectAttributes.addFlashAttribute("mensagemErro", "Produto não encontrado com ID: " + id);
-            return "redirect:/produtos";
-        }
-    }
-
-    @PostMapping // Salvar no POST /produtos
+    @PostMapping("/cadastro")
     public String salvarProduto(@ModelAttribute Produto produto,
             @RequestParam("categoriaId") Integer categoriaId,
             @RequestParam("foto") MultipartFile foto,
@@ -97,6 +85,16 @@ public class ProdutoController {
             return "produtos/cadastro";
         }
     }
+
+    @GetMapping("/editar/{id}")
+    public String editarProduto(@PathVariable Integer id, Model model) {
+        Produto produto = produtoService.buscarPorId(id);
+
+        model.addAttribute("produto", produto);
+        model.addAttribute("categorias", categoriaService.buscarTodosAsCategorias());
+        return "produtos/editar";
+    }
+
 
     @PostMapping("/editar/{id}")
     public String atualizarProduto(@PathVariable Integer id,

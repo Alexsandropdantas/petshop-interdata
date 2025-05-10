@@ -42,11 +42,7 @@ public class EstoqueService {
     }
 
     public List<Estoque> listarPorProduto(Integer produtoId) {
-        Optional<Produto> produtoOpt = produtoRepository.findById(produtoId);
-        if (produtoOpt.isPresent()) {
-            return estoqueRepository.findByProdutoIdOrderByDataEntradaDesc(produtoId);
-        }
-        return List.of();
+        return estoqueRepository.findByProdutoIdOrderByDataEntradaDesc(produtoId);
     }
 
     public Integer getTotalQuantidadePorProduto(Integer produtoId) {

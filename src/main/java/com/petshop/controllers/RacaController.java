@@ -53,7 +53,7 @@ public class RacaController {
     @GetMapping("/editar/{id}")
     public String exibirFormularioEdicao(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Raca raca = racaService.buscarPorIdOuFalhar(id);
+            Raca raca = racaService.buscarPorId(id);
             model.addAttribute("raca", raca);
             model.addAttribute("especies", especieService.buscarTodasAsEspecies());
             return "racas/editar";

@@ -9,7 +9,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AnimalService {
@@ -42,8 +41,7 @@ public class AnimalService {
         }
 
         if (animal.getRaca() != null && animal.getRaca().getId() != null) {
-            Raca raca = racaService.buscarPorId(animal.getRaca().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Raça não encontrada para este animal"));
+            Raca raca = racaService.buscarPorId(animal.getRaca().getId());
             animal.setRaca(raca);
         } else {
             throw new IllegalArgumentException("Raça é obrigatória para salvar o animal.");
