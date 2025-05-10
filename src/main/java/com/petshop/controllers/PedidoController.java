@@ -114,4 +114,19 @@ public class PedidoController {
         return "redirect:/pedidos/" + numeroPedido;
     }
 
+
+    @GetMapping("/removerItem/{id}")
+    public String deletarItemPedido(@PathVariable Integer id) {
+        Integer numeroPedido = itemDePedidoService.buscarNumeroPedidoPorItemId(id);
+        itemDePedidoService.excluirItemDePedidoPorId(id);
+        return "redirect:/pedidos/" + numeroPedido;
+    }
+
+    @GetMapping("/deletar/{id}")
+    public String deletarPedido(@PathVariable Integer id) {
+        pedidoService.excluir(id);
+        return "redirect:/pedidos";
+    }
+
+
 }

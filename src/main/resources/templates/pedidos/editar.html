@@ -114,8 +114,9 @@
                         <td th:text="${#numbers.formatDecimal(item.desconto, 1, 2)}">[Desc %]</td>
                         <td class="table-actions">
                             <form
-                                th:action="@{/pedidos/removerItem/{num}/{itemId}(num=${pedido.numeroPedido}, itemId=${item.id})}"
-                                method="post" onsubmit="return confirm('Tem certeza que deseja remover este item?');">
+                                th:action="@{'/pedidos/removerItem/' + ${item.id}}"
+                                method="get" onsubmit="return confirm('Tem certeza que deseja remover este item?');">
+
                                 <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
                             </form>
                         </td>

@@ -85,5 +85,14 @@ public class ItemDePedidoService {
     }
 
 
+    /**
+     * Busca o número do pedido de um item específico
+     * @param itemId o ID do item de pedido
+     * @return O número do pedido como Integer
+     */
+    public Integer buscarNumeroPedidoPorItemId(Integer itemId) {
+        return itemDePedidoRepository.findNumeroPedidoByItemId(itemId);
+    }
+
 
 }

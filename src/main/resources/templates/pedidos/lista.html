@@ -30,7 +30,7 @@
                         <td ></td>
                         <td th:text="${#temporals.format(pedido.dataEHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
                         <td>
-                            <a th:href="@{'/pedidos/editar/' + ${pedido.numeroPedido}}"
+                            <a th:href="@{'/pedidos/' + ${pedido.numeroPedido}}"
                                 class="btn btn-warning btn-sm">Editar</a>
                             <a th:href="@{'/pedidos/deletar/' + ${pedido.numeroPedido}}" class="btn btn-danger btn-sm"
                                 onclick="return confirm('Deseja realmente excluir este pedido?');">Excluir</a>

@@ -11,6 +11,7 @@ import com.petshop.model.Produto;
 import com.petshop.repository.EstoqueRepository;
 import com.petshop.repository.ProdutoRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -23,6 +24,11 @@ public class EstoqueService {
     @Autowired
     public EstoqueService(EstoqueRepository estoqueRepository, ProdutoRepository produtoRepository) {
         this.estoqueRepository = estoqueRepository;
+    }
+
+    public Estoque buscarProdutoPorId(Integer id) {
+        return estoqueRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Estoque não encontrado com ID: " + id));
     }
 
     public List<Estoque> buscarEstoqueDeProdutos() {
@@ -49,5 +55,11 @@ public class EstoqueService {
         Integer total = estoqueRepository.getTotalQuantidadeByProdutoId(produtoId);
         return total != null ? total : 0;
     }
+
+    public void salvar(Estoque estoque) {  
+        estoqueRepository.save(estoque);
+    }
+
+
 
 }

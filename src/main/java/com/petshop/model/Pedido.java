@@ -23,27 +23,14 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ItemDePedido> itens = new ArrayList<>();
 
-    // Relacionamento com Cliente (opcional, pode estar no item)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_clientes_id")
-    private Cliente cliente;
-
-    // Relacionamento com Vendedor (opcional, pode estar no item)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_vendedores_id")
-    private Vendedor vendedor;
-
     // Construtor
     public Pedido() {
     }
 
-    public Pedido(Integer numeroPedido, LocalDateTime dataEHora, List<ItemDePedido> itens, Cliente cliente,
-            Vendedor vendedor) {
+    public Pedido(Integer numeroPedido, LocalDateTime dataEHora, List<ItemDePedido> itens) {
         this.numeroPedido = numeroPedido;
         this.dataEHora = dataEHora;
         this.itens = itens;
-        this.cliente = cliente;
-        this.vendedor = vendedor;
     }
 
     // Getters, Setters
@@ -71,20 +58,5 @@ public class Pedido {
         this.itens = itens;
     }
 
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public Vendedor getVendedor() {
-        return vendedor;
-    }
-
-    public void setVendedor(Vendedor vendedor) {
-        this.vendedor = vendedor;
-    }
 
 }
