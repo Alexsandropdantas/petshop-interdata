@@ -19,4 +19,6 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Integer> {
 
     @Query("SELECT SUM(p.valorPago) FROM Pagamento p WHERE p.pedido.numeroPedido = :numeroPedido")
     Double sumValorPagoByPedidoNumeroPedido(@Param("numeroPedido") Integer numeroPedido);
+
+    // List<Pagamento> findByFkPedidosNumeroPedido(Integer numeroPedido);
 }

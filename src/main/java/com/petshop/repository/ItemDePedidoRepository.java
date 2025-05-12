@@ -30,4 +30,6 @@ public interface ItemDePedidoRepository extends JpaRepository<ItemDePedido, Inte
     @Query("SELECT i.pedido.numeroPedido FROM ItemDePedido i WHERE i.id = :itemId")
     Integer findNumeroPedidoByItemId(@Param("itemId") Integer itemId);
 
+  //  List<ItemDePedido> findByFkPedidosNumeroPedido(Integer numeroPedido);
+
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.petshop.model.Animal;
 import com.petshop.model.Estoque;
 import com.petshop.model.Produto;
 import com.petshop.services.EstoqueService;
