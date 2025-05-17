@@ -11,10 +11,10 @@ public class ItemDePedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "quantidade") // Schema diz INT
+    @Column(name = "quantidade")
     private Integer quantidade;
 
-    @Column(name = "preco_unitario") // Preço no momento da venda
+    @Column(name = "preco_unitario")
     private Double precoUnitario;
 
     @Column(name = "desconto") // Desconto específico do item
@@ -49,11 +49,10 @@ public class ItemDePedido {
     public ItemDePedido() {
     }
 
-    public ItemDePedido(Integer id, Integer quantidade, Double precoUnitario, Double desconto, Pedido pedido,
-            Produto produto, Cliente cliente, Animal animal, Vendedor vendedor) {
+    public ItemDePedido(Integer id, Produto produto, Integer quantidade,  Double desconto, Pedido pedido,
+             Cliente cliente, Animal animal, Vendedor vendedor) {
         this.id = id;
         this.quantidade = quantidade;
-        this.precoUnitario = precoUnitario;
         this.desconto = desconto;
         this.pedido = pedido;
         this.produto = produto;

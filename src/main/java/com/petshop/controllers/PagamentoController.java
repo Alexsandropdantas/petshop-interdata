@@ -1,5 +1,6 @@
 package com.petshop.controllers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -120,12 +121,13 @@ public class PagamentoController {
             // Calcula o total já pago
             List<Pagamento> pagamentos = pagamentoService.buscarPorPedido(fkPedidosNumeroPedido);
 
-            // pagamento.setFkPedidosNumeroPedido(pedido.get());
-            // pagamento.setFkFormasDePagamento(formaPagamentoOpt.get());
-            // pagamento.setDataEHora(LocalDateTime.now());
+            pagamento.setPedido(pedido);
+            pagamento.setFormaDePagamento(formaPagamento);
+
+            pagamento.setDataEHora(LocalDateTime.now());
             
             // // Salva o pagamento
-            // pagamentosRepository.save(pagamento);
+            pagamentoService.salvar(pagamento);
             
             redirectAttributes.addFlashAttribute("mensagemSucesso", "Pagamento registrado com sucesso!");
             return "redirect:/pagamentos/pedido/" + fkPedidosNumeroPedido;

@@ -23,7 +23,7 @@ public class Pagamento {
     private Pedido pedido;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_formas_de_pagamento_id")
+    @JoinColumn(name = "fk_formas_de_pagamento")
     private FormaDePagamento formaDePagamento;
 
     // --- Construtores

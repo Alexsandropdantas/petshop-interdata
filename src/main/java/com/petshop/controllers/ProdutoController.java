@@ -1,12 +1,10 @@
 package com.petshop.controllers;
 
 import com.petshop.comum.BibliotecaDeMetodosComunsAoSistema;
-import com.petshop.model.Animal;
 import com.petshop.model.Categoria;
 import com.petshop.model.Produto;
 import com.petshop.services.CategoriaService;
 import com.petshop.services.ProdutoService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;

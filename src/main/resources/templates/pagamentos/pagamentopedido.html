@@ -22,13 +22,19 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <p><strong>Cliente:</strong> <span ></span></p>
+                            <p><strong>Cliente:</strong> 
+                                <br />
+                                <span th:text="${pedido.numeroPedido}"></span></p>
                         </div>
                         <div class="col-md-4">
-                            <p><strong>Data e Hora:</strong></p>
+                            <p><strong>Data e Hora:</strong>
+                                <br />
+                                <span th:text="${pedido.numeroPedido}"></span></p>
                         </div>
                         <div class="col-md-4">
-                            <p><strong>Vendedor:</strong> </p>
+                            <p><strong>Vendedor:</strong>
+                                <br />
+                                <span th:text="${pedido.numeroPedido}"></span></p>
                         </div>
                     </div>
                 </div>
@@ -53,7 +59,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="item : ${itensDePedido}">
-                                <td th:text="${item.nome}"></td>
+                                <td th:text="${item.quantidade}"></td>
                                 <td th:text="${item.produto.nome}"></td>
                                 <td th:text="${item.quantidade}"></td>
                                 <td th:text="${#numbers.formatCurrency(item.precoUnitario)}"></td>
@@ -87,7 +93,7 @@
                         <tbody>
                             <tr th:each="pagamento : ${pagamentos}">
                                 <td th:text="${#temporals.format(pagamento.dataEHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
-                                <td th:text="${pagamento.fkFormasDePagamento != null ? pagamento.fkFormasDePagamento.descricao : 'N/A'}"></td>
+                                <td th:text="${pagamento.formaDePagamento}"></td>
                                 <td th:text="${#numbers.formatCurrency(pagamento.valorPago)}"></td>
                                 <td>
                                     <a th:href="@{'/pagamentos/deletar/' + ${pagamento.id}}" class="btn btn-danger btn-sm"

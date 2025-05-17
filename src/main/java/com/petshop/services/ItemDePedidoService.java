@@ -68,6 +68,8 @@ public class ItemDePedidoService {
 
         item.setProduto(produto);
 
+        item.setPrecoUnitario(produto.getPreco());
+
         item.setQuantidade(quantidade);
 
         item.setCliente(cliente);

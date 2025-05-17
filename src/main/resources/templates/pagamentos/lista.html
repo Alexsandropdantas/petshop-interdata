@@ -23,7 +23,7 @@
                 <tbody>
                     <tr th:each="pagamento : ${pagamentos}">
                         <td th:text="${pagamento.id}"></td>
-                        <td th:text="${pagamento.nome}"></td>
+                        <td th:text="${pagamento.valorPago}"></td>
                         <td>
                             <a th:href="@{'/pagamentos/editar/' + ${pagamento.id}}"
                                 class="btn btn-warning btn-sm">Editar</a>
