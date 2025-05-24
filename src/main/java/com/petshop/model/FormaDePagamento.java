@@ -71,6 +71,6 @@ public class FormaDePagamento {
 
     @Override
     public String toString() {
-        return "FormaDePagamento{" + "id=" + id + ", descricao='" + descricao + '\'' + '}';
+        return descricao;
     }
 }
