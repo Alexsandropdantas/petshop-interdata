@@ -9,7 +9,10 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PagamentoService {
@@ -90,5 +93,21 @@ public class PagamentoService {
         if (pagamento.getValorPago() == null || pagamento.getValorPago() <= 0) {
             throw new IllegalArgumentException("Valor do pagamento deve ser positivo.");
         }
+    }
+
+    public List<Map<String, Object>> getTotalVendasPorMes2024() {
+        List<Object[]> resultados = pagamentoRepository.findTotalVendasPorMes2024();
+        List<Map<String, Object>> vendasPorMesList = new ArrayList<>();
+
+        for (Object[] resultado : resultados) {
+            Map<String, Object> vendaMesMap = new HashMap<>();
+            vendaMesMap.put("mes", (String) resultado[0]); 
+    
+            vendaMesMap.put("totalVendas", (Double) resultado[1]);
+
+            vendasPorMesList.add(vendaMesMap);
+        }
+
+        return vendasPorMesList;
     }
 }
